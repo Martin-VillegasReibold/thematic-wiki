@@ -1,22 +1,31 @@
 import React from "react";
 import LayoutDetails from "../components/LayoutDetails";
 import { useParams } from "react-router";
-import tablets from "../const/tablets";
+import { useItem } from "../hooks/use-item";
 import NotFound from "./NotFound";
 import PageTransition from "../components/PageTransition";
+import Loading from "../components/Loading";
 
 const Details = () => {
   const { id } = useParams();
-  const item = tablets.find((t) => t.id === parseInt(id));
+  const { item, loading, error } = useItem('tablets', id);
 
-  if (!item) return <NotFound />;
-  
+  if (loading) {
+    return (
+      <PageTransition>
+        <Loading />
+      </PageTransition>
+    );
+  }
+
+  if (error || !item) return <NotFound />;
+
   const sections = [
     {
       title: "Overview",
-      content: item.description
+      content: item.description,
     },
-    ...(item.details || [])
+    ...(item.details || []),
   ];
 
   return (

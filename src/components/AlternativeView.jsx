@@ -1,20 +1,23 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router";
-import characters from "../const/characters";
+import { useApi } from "../hooks/use-api";
 import { BsSunrise, BsSunset } from "react-icons/bs";
 
 const AlternativeView = ({ currentId, currentName }) => {
+  const { data: characters } = useApi('characters');
+
   // Find ALL versions including current one to show full timeline
   const variants = useMemo(() => {
+    if (!characters || !Array.isArray(characters)) return [];
     return characters
-      .filter((c) => c.info.name === currentName)
+      .filter((c) => c?.info?.name === currentName)
       .sort((a, b) => {
         // Safe robust parse for Age
-        const ageA = parseInt(a.info.age) || 0;
-        const ageB = parseInt(b.info.age) || 0;
+        const ageA = parseInt(a?.info?.age) || 0;
+        const ageB = parseInt(b?.info?.age) || 0;
         return ageA - ageB;
       });
-  }, [currentName]);
+  }, [currentName, characters]);
 
   // Only show if there is actually more than 1 version total
   if (variants.length <= 1) return null;
@@ -32,7 +35,7 @@ const AlternativeView = ({ currentId, currentName }) => {
 
       <div className="flex flex-col-reverse sm:flex-col gap-3 sm:gap-4 items-end">
         {variants.map((variant) => {
-          const isCurrent = variant.id === parseInt(currentId);
+          const isCurrent = String(variant.id) === String(currentId);
 
           return (
             <Link
@@ -47,7 +50,7 @@ const AlternativeView = ({ currentId, currentName }) => {
               {!isCurrent && (
                 <div className="absolute right-full mr-3 bg-paper border border-border px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0 pointer-events-none whitespace-nowrap z-10 w-max hidden sm:block">
                   <div className="font-bold text-ink text-sm">
-                    {variant.info.titles.split(",")[0]}
+                    {(variant.info?.titles || "").split(",")[0]}
                   </div>
                   <div className="text-xs text-clay font-bold">
                     Arc - {variant.chapter}
@@ -56,24 +59,29 @@ const AlternativeView = ({ currentId, currentName }) => {
                   <div className="absolute top-1/2 -right-1.5 w-3 h-3 bg-paper border-t border-r border-border transform -translate-y-1/2 rotate-45"></div>
                 </div>
               )}
-
-              {/* Avatar Circle */}
-              <div
+              
+               {/* Avatar Circle */}
+               <div
                 className={`relative shrink-0 transition-transform duration-300 ${
                   isCurrent
                     ? "scale-110 z-10"
                     : "group-hover:scale-110 active:scale-95"
                 } w-12 h-12 sm:w-16 sm:h-16`}
               >
-                <img
-                  src={variant.images.portrait}
-                  alt={variant.info.name}
-                  className={`w-full h-full object-cover rounded-full shadow-md transition-colors ${
-                    isCurrent
-                      ? "border-4 border-clay shadow-[0_0_15px_rgba(var(--color-clay),0.6)]"
-                      : "border-2 sm:border-4 border-paper group-hover:border-clay"
-                  }`}
-                />
+                {variant.images?.portrait ? (
+                  <img
+                    src={variant.images.portrait}
+                    alt={variant.info.name}
+                    className={`w-full h-full object-cover rounded-full shadow-md transition-colors ${
+                      isCurrent
+                        ? "border-4 border-clay shadow-[0_0_15px_rgba(var(--color-clay),0.6)]"
+                        : "border-2 sm:border-4 border-paper group-hover:border-clay"
+                    }`}
+                  />
+                ) : (
+                  <div className={`w-full h-full rounded-full ${isCurrent ? "bg-clay" : "bg-paper border-2 border-clay"}`} />
+                )}
+                
                 {/* Current Indicator Icon (Mobile/Desktop) or Age Badge */}
                 <div
                   className={`absolute -bottom-1 -right-1 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-bold border-2 border-white shadow-sm ${

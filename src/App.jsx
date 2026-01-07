@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar.jsx";
 import Footer from "./components/Footer.jsx";
 import { ROUTES } from "./const/index";
 import { AnimatedRoutes } from "./components/PageTransition.jsx"; // Import helper
+import Loading from "./components/Loading";
 
 const Timeline = lazy(() => import("./pages/Timeline.jsx"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage.jsx"));
@@ -25,17 +26,15 @@ function App() {
           <Layout>
             <Sidebar />
             <Suspense fallback={
-              <div className="flex items-center justify-center min-h-[50vh] w-full">
-                <div className="text-ink font-title text-xl animate-pulse">Loading Tablet...</div>
-              </div>
+              <Loading text="Loading Tablet..." />
             }>
               <AnimatedRoutes>
                 <Route path={ROUTES.home} element={<Home />} />
+                <Route path={ROUTES.charPage} element={<CharPage />} />
                 <Route path={ROUTES.globalSearch} element={<CategoryPage items={searchResults} />} />
                 <Route path={ROUTES.timeline} element={<Timeline />} />
                 <Route path={ROUTES.lore} element={<CategoryPage category="timeline" />} />
-                <Route path={ROUTES.characters} element={<CategoryPage category="characters" />} />
-                <Route path={ROUTES.charPage} element={<CharPage />} />
+                <Route path={ROUTES.characters} element={<CategoryPage category="characters" basePath="/characters" />} />
                 
                 {/* Dynamic Category Pages */}
                 {[

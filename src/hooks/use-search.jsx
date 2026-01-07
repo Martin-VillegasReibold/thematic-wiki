@@ -4,7 +4,7 @@ import React, {useMemo} from "react";
  * It accepts a filter string and returns the filtered results with matched terms highlighted.
  */
 
-import tablets from "../const/tablets";
+import { useApi } from "./use-api";
 import Fuse from "fuse.js";
 
 function formatMatch({ indices, value }) {
@@ -28,17 +28,25 @@ function formatMatch({ indices, value }) {
 }
 
 const useSearch = ({ filter = "" }) => {
-  const fuse = useMemo(() => new Fuse(tablets, {
-    keys: ["title", "description"],
-    includeMatches: true,
-    threshold: 0.3,
-    ignoreLocation: true,
-    minMatchCharLength: 4,
-  }), []);
+  const { data: tablets } = useApi('tablets');
+
+  const fuse = useMemo(() => {
+    if (!tablets || tablets.length === 0) return null;
+    return new Fuse(tablets, {
+      keys: ["title", "description"],
+      includeMatches: true,
+      threshold: 0.3,
+      ignoreLocation: true,
+      minMatchCharLength: 4,
+    });
+  }, [tablets]);
 
   const filteredTablets = useMemo(() => {
+    if (!tablets) return [];
     if (!filter) return tablets;
-    return fuse.search(filter).map(result => {
+    if (!fuse) return tablets;
+
+    return fuse.search(filter).map((result) => {
       let displayName = result.item.title;
       let displayDescription = result.item.description;
 
@@ -56,7 +64,7 @@ const useSearch = ({ filter = "" }) => {
         displayDescription,
       };
     });
-  }, [filter, fuse]);
+  }, [filter, fuse, tablets]);
 
   return { result: filteredTablets };
 };

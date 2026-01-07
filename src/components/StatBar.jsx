@@ -1,11 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
-import useParseGrade from "../hooks/use-parse-grade";
 import Tooltip from "./Tooltip";
+import parseGrade from "../utils/grade-parser";
+
 
 const StatBar = ({ label, filled, grade, description }) => {
   // Usar helper para parsear la nota (base + bonus)
-  const { baseValue, bonus } = useParseGrade(grade);
+  const { baseValue, bonus } = parseGrade(grade);
   return (
     <div className="flex items-center w-full gap-2">
       <Tooltip text={`${description || ""}`}>

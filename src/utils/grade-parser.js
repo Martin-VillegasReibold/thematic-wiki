@@ -1,5 +1,3 @@
-import React from 'react'
-
 const GRADE_MAP = {
   "?": 0,
   F: 1,
@@ -14,7 +12,7 @@ const GRADE_MAP = {
   MAX: 10,
 };
 // Parse a grade like 'A++' -> { base: 'A', bonus: 2, baseValue: 6, totalValue: 8 }
-const useParseGrade = (grade) => {
+export const parseGrade = (grade) => {
   if (!grade) return { base: "?", bonus: 0, baseValue: 0, totalValue: 0 };
   let base = grade;
   let bonus = 0;
@@ -29,4 +27,4 @@ const useParseGrade = (grade) => {
   return { base, bonus, baseValue, totalValue: baseValue + bonus };
 }
 
-export default useParseGrade
+export default parseGrade;

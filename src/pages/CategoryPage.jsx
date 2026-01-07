@@ -1,11 +1,23 @@
 import React from "react";
 import LayoutCards from "../components/LayoutCards";
-import tablets from "../const/tablets";
+import { useApi } from "../hooks/use-api";
 import PageTransition from "../components/PageTransition";
+import Loading from "../components/Loading";
 
 const CategoryPage = ({ category, basePath, items }) => {
+  const { data: tablets, loading } = useApi('tablets');
+
   const displayItems =
-    items || tablets.filter((item) => item.category === category);
+    items || (tablets ? tablets.filter((item) => item.category === category) : []);
+
+  if (loading && !items) {
+    return (
+      <PageTransition>
+        <Loading />
+      </PageTransition>
+    );
+  }
+
   return (
     <PageTransition>
       <LayoutCards items={displayItems} basePath={basePath} />
